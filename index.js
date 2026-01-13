@@ -1,76 +1,22 @@
 /******************** SONGS ********************/
+import { nameBand, nameSongs } from './config.js';
 
-const nameBand = 'MUSE';
+const MAXIMUM_LENGTH_OF_PLAYLIST = 20;
+const arraySongs = Array.from({ length: MAXIMUM_LENGTH_OF_PLAYLIST }, (_, i) => `songs/n${i + 1}.mp3`);
 
-let nameSongs = [
-	"HYSTERIA", /*1*/
-	"UPRISING", /*2*/
-	"RESISTANCE", /*3*/
-	"UNDISCLOSED DESIRES", /*4*/
-	"MADNESS", /*5*/
-	"SUPREMACY", /*6*/
-	"SURVIVAL", /*7*/
-	"BIG FREEZE", /*8*/
-	"SAVE ME", /*9*/
-	"ISOLATED SYSTEM", /*10*/
-	"ANIMALS", /*11*/
-	"EXPLORERS", /*12*/
-	"EXO-POLITICS", /*13*/
-	"CITY OF DELUSION", /*14*/
-	"KNIGHTS OF CYDONIA", /*15*/
-	"INVINCIBLE", /*16*/
-	"GLORIOUS", /*17*/
-	"TAKE A BOW", /*18*/
-	"MAP OF THE PROBLEMATIQUE", /*19*/
-	"SHOWBIZ", /*20*/
-]
-
-const arraySongs = [
-  'songs/n1.mp3',
-  'songs/n2.mp3',
-  'songs/n3.mp3',
-  'songs/n4.mp3',
-  'songs/n5.mp3',
-  'songs/n6.mp3',
-  'songs/n7.mp3',
-  'songs/n8.mp3',
-  'songs/n9.mp3',
-  'songs/n10.mp3',
-  'songs/n11.mp3',
-  'songs/n12.mp3',
-  'songs/n13.mp3',
-  'songs/n14.mp3',
-  'songs/n15.mp3',
-  'songs/n16.mp3',
-  'songs/n17.mp3',
-  'songs/n18.mp3',
-  'songs/n19.mp3',
-  'songs/n20.mp3'
-];
+function updateRowsModalAndButtonActive() {
+  setTimeout(() => {
+    updateButtonNavActive($('.am-button-nav-modal.order'), 'button-nav-selected');
+    scrollToBottomContainerModal();
+  }, 50);
+}
 
 /******************** MEDIA SESSION CONFIG ********************/
-const playlist = [
-  { title: nameSongs[0], artist: nameBand, url: arraySongs[0] },
-  { title: nameSongs[1], artist: nameBand, url: arraySongs[1] },
-  { title: nameSongs[2], artist: nameBand, url: arraySongs[2] },
-  { title: nameSongs[3], artist: nameBand, url: arraySongs[3] },
-  { title: nameSongs[4], artist: nameBand, url: arraySongs[4] },
-  { title: nameSongs[5], artist: nameBand, url: arraySongs[5] },
-  { title: nameSongs[6], artist: nameBand, url: arraySongs[6] },
-  { title: nameSongs[7], artist: nameBand, url: arraySongs[7] },
-  { title: nameSongs[8], artist: nameBand, url: arraySongs[8] },
-  { title: nameSongs[9], artist: nameBand, url: arraySongs[9] },
-  { title: nameSongs[10], artist: nameBand, url: arraySongs[10] },
-  { title: nameSongs[11], artist: nameBand, url: arraySongs[11] },
-  { title: nameSongs[12], artist: nameBand, url: arraySongs[12] },
-  { title: nameSongs[13], artist: nameBand, url: arraySongs[13] },
-  { title: nameSongs[14], artist: nameBand, url: arraySongs[14] },
-  { title: nameSongs[15], artist: nameBand, url: arraySongs[15] },
-  { title: nameSongs[16], artist: nameBand, url: arraySongs[16] },
-  { title: nameSongs[17], artist: nameBand, url: arraySongs[17] },
-  { title: nameSongs[18], artist: nameBand, url: arraySongs[18] },
-  { title: nameSongs[19], artist: nameBand, url: arraySongs[19] }
-];
+const playlist = Array.from({ length: MAXIMUM_LENGTH_OF_PLAYLIST }, (_, i) => ({
+  title: nameSongs[i]?.trim(),
+  artist: nameBand,
+  url: arraySongs[i]
+}));
 
 function toCapitalize(text = '') {
   return text
@@ -660,7 +606,8 @@ d.addEventListener('click', e => {
         .querySelector('.container-add-playlist')
         .classList.remove('mode-active');
     }, 500);
-    d.getElementById('agregarPlaylistInput').value = '';
+    $('#agregarPlaylistInput').value = '';
+    updateButtonNavActive($('.am-button-nav-modal.order'), 'button-nav-selected');
     return;
   }
 
@@ -693,6 +640,7 @@ d.addEventListener('click', e => {
         })
       );
       RenderPlaylistItems();
+      updateRowsModalAndButtonActive();
       input.value = '';
       return;
     }
@@ -705,7 +653,7 @@ d.addEventListener('click', e => {
 
     localStorage.setItem('listname-cards', newObjectListNameCards);
     RenderPlaylistItems();
-    $('.container-modal').scrollTop = $('.container-modal').scrollHeight;
+    updateRowsModalAndButtonActive();
     input.value = '';
   }
   /******************** EVENT DELEGATION NAV ********************/
@@ -789,7 +737,6 @@ d.addEventListener('change', e => {
       localStorage.setItem('listname-cards', JSON.stringify(newObject));
 
       $output.innerHTML = Number($output.innerHTML) + 1;
-      RenderPlaylistItems();
       return;
     }
 
@@ -813,7 +760,6 @@ d.addEventListener('change', e => {
 
     localStorage.setItem('listname-cards', JSON.stringify(newObject));
     $output.innerHTML = Number($output.innerHTML) - 1;
-    RenderPlaylistItems();
     return;
   }
 });
@@ -866,6 +812,7 @@ d.addEventListener('keydown', e => {
         })
       );
       RenderPlaylistItems();
+      updateRowsModalAndButtonActive();
       input.value = '';
       return;
     }
@@ -878,7 +825,7 @@ d.addEventListener('keydown', e => {
 
     localStorage.setItem('listname-cards', newObjectListNameCards);
     RenderPlaylistItems();
-    $('.container-modal').scrollTop = $('.container-modal').scrollHeight;
+    updateRowsModalAndButtonActive();
     input.value = '';
   }
 });
@@ -933,7 +880,7 @@ function RenderPlaylistItems() {
       clon.querySelector('label').innerHTML = key;
       clon.querySelector('output').setAttribute('class', toKebabCase(key));
       clon.querySelector('output').innerHTML = objectNames[key].length;
-      if (objectNames[key].length === 20) {
+      if (objectNames[key].length === MAXIMUM_LENGTH_OF_PLAYLIST) {
         clon.querySelector('input[type=checkbox]').disabled = 'true';
         guardarKey = key;
       }
@@ -1036,3 +983,157 @@ const observer = new IntersectionObserver(
 );
 
 cards.forEach(card => observer.observe(card));
+
+/******************** BUTTON NAV MODAL ********************/
+
+let containerModal = document.querySelector('.container-modal');
+
+function RenderPlaylistItemsOfTheContainerBottom(objectOfCards) {
+  const currentName = localStorage.getItem('lastCurrentNameSong');
+
+  if (!currentName) return;
+
+  const objectNames =
+    objectOfCards ?? JSON.parse(localStorage.getItem('listname-cards'));
+  const template = $('.template-modal-fila').content;
+  const tituloModal = $('.tituto-modal');
+  const containerModal = $('.container-modal');
+
+  tituloModal.textContent = `Save ${currentName} in..`;
+  containerModal.innerHTML = '';
+
+  const fragment = d.createDocumentFragment();
+  const currentPlaylists = existThisSongInSomePlaylist(currentName);
+
+  for (const name in objectNames) {
+    const kebabName = toKebabCase(name);
+    const playlist = objectNames[name];
+    const clone = template.cloneNode(true);
+
+    const input = clone.querySelector('input');
+    const label = clone.querySelector('label');
+    const output = clone.querySelector('output');
+
+    input.id = name;
+    input.dataset.clase = kebabName;
+    input.disabled = playlist.length === MAXIMUM_LENGTH_OF_PLAYLIST;
+
+    label.htmlFor = name;
+    label.textContent = name;
+
+    output.className = kebabName;
+    output.textContent = playlist.length;
+
+    fragment.appendChild(clone);
+  }
+
+  containerModal.appendChild(fragment);
+
+  currentPlaylists.forEach(name => {
+    const checkbox = containerModal.querySelector(
+      `[data-clase="${toKebabCase(name)}"]`
+    );
+    if (checkbox) {
+      checkbox.checked = true;
+      checkbox.disabled = false;
+    }
+  });
+}
+
+function updateButtonNavActive(target, classNameToAdd) {
+  if (!target.classList.contains(classNameToAdd)) {
+    $(`.${classNameToAdd}`).classList.remove(classNameToAdd);
+    let timer = setTimeout(() => {
+      target.classList.add(classNameToAdd);
+      clearTimeout(timer);
+    }, 20);
+  }
+}
+
+function scrollToTopContainerModal() {
+  $('.container-modal').scrollTop = 0;
+}
+
+function scrollToBottomContainerModal() {
+  $('.container-modal').scrollTop = $('.container-modal').scrollHeight;
+}
+
+document.addEventListener('click', e => {
+  const target = e.target;
+  if (target.matches('.am-button-nav-modal')) {
+    if (target.matches('.order')) {
+      containerModal.innerHTML = '';
+
+      updateButtonNavActive(target, 'button-nav-selected');
+      scrollToTopContainerModal();
+      RenderPlaylistItemsOfTheContainerBottom();
+      return;
+    }
+
+    if (target.matches('.unorder')) {
+      containerModal.innerHTML = '';
+      updateButtonNavActive(target, 'button-nav-selected');
+      scrollToTopContainerModal();
+
+      const objectNames = JSON.parse(localStorage.getItem('listname-cards'));
+      if (!objectNames) return;
+      const reversedObj = Object.entries(objectNames)
+        .reverse()
+        .reduce((acc, [key, value]) => {
+          acc[key] = value;
+          return acc;
+        }, {});
+
+      RenderPlaylistItemsOfTheContainerBottom(reversedObj);
+      return;
+    }
+
+    if (target.matches('.random')) {
+      containerModal.innerHTML = '';
+      updateButtonNavActive(target, 'button-nav-selected');
+      scrollToTopContainerModal();
+
+      const objectNames = JSON.parse(localStorage.getItem('listname-cards'));
+      if (!objectNames) return;
+      const shuffledEntries = Object.entries(objectNames).sort(
+        () => Math.random() - 0.5
+      );
+
+      const shuffledObj = Object.fromEntries(shuffledEntries);
+      RenderPlaylistItemsOfTheContainerBottom(shuffledObj);
+      return;
+    }
+
+    if (target.matches('.a-to-z')) {
+      containerModal.innerHTML = '';
+      updateButtonNavActive(target, 'button-nav-selected');
+      scrollToTopContainerModal();
+
+      const objectNames = JSON.parse(localStorage.getItem('listname-cards'));
+      if (!objectNames) return;
+      const sortedEntries = Object.entries(objectNames).sort((a, b) =>
+        a[0].localeCompare(b[0])
+      );
+
+      const sortedObj = Object.fromEntries(sortedEntries);
+      RenderPlaylistItemsOfTheContainerBottom(sortedObj);
+      return;
+    }
+
+    if (target.matches('.z-to-a')) {
+      containerModal.innerHTML = '';
+      updateButtonNavActive(target, 'button-nav-selected');
+      scrollToTopContainerModal();
+
+      const objectNames = JSON.parse(localStorage.getItem('listname-cards'));
+      if (!objectNames) return;
+      const sortedEntries = Object.entries(objectNames).sort((a, b) =>
+        b[0].localeCompare(a[0])
+      );
+
+      const sortedObj = Object.fromEntries(sortedEntries);
+      RenderPlaylistItemsOfTheContainerBottom(sortedObj);
+      return;
+    }
+  }
+});
